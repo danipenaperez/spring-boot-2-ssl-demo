@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.2.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.dppware</groupId>
+	<artifactId>spring-boot-2-ssl-demo</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>demossl</name>
+	<description>Demo project for Spring Boot 2 using Http and Https and keytool plugin</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<!-- keytool ssl cert configuration -->
+				<!-- KEYSTORE CONFIGURATION -->
+				<ssl.keytool.keystore.type>PKCS12</ssl.keytool.keystore.type>
+				<ssl.keytool.keystore.name>keystore-dev.p12</ssl.keytool.keystore.name>
+				<ssl.keytool.keystore.password>s3cr3t</ssl.keytool.keystore.password>
+				<!-- CERTIFICATE CONFIGURATION -->
+				<ssl.keytool.cert.alias>myAmazingCompanyCert-dev</ssl.keytool.cert.alias>
+				<ssl.keytool.cert.sitename>myamazingapp-dev.com</ssl.keytool.cert.sitename> <!--  CName-->
+				<ssl.keytool.cert.organizationUnit>My Amazing Department-dev</ssl.keytool.cert.organizationUnit>
+				<ssl.keytool.cert.organization>My Amazing Company-dev</ssl.keytool.cert.organization>
+				<ssl.keytool.cert.city>Amazing City (Vallekas)</ssl.keytool.cert.city>
+				<ssl.keytool.cert.country>Amazing Country (Vallekas Independent State)</ssl.keytool.cert.country>
+				<ssl.keytool.cert.countryCode>VK</ssl.keytool.cert.countryCode>
+				<ssl.keytool.cert.validityDays>365</ssl.keytool.cert.validityDays>
+			</properties>
+			<build>
+				<resources>
+					<resource>
+						<directory>profiles/dev</directory>
+						<filtering>true</filtering>
+					</resource>
+					<resource>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>keytool-maven-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>generateKeyPair</goal>
+								</goals>
+								<phase>generate-resources</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<!-- keystore>${project.build.directory}/${ssl.keytool.keystore.name}</keystore> -->
+							<keystore>${project.build.outputDirectory}/${ssl.keytool.keystore.name}</keystore>
+							<storepass>${ssl.keytool.keystore.password}</storepass>
+							<storetype>${ssl.keytool.keystore.type}</storetype>
+							<keyalg>RSA</keyalg>
+							<dname>CN=${ssl.keytool.cert.sitename},
+								OU=${ssl.keytool.cert.organizationUnit},
+								O=${ssl.keytool.cert.organization}, L=${ssl.keytool.cert.city},
+								ST=${ssl.keytool.cert.country}, C=${ssl.keytool.cert.countryCode}</dname>
+							<alias>${ssl.keytool.cert.alias}</alias>
+							<skipIfExist>false</skipIfExist>
+							<verbose>true</verbose>
+							<validity>${ssl.keytool.cert.validityDays}</validity>
+						</configuration>
+					</plugin>
+					<plugin>
+				        <groupId>org.springframework.boot</groupId>
+				        <artifactId>spring-boot-maven-plugin</artifactId>
+				        <configuration>
+				          <jvmArguments>
+				            -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+				          </jvmArguments>
+				        </configuration>
+				     </plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<!-- This profile use a valid Offical cert, so fill the empty field with the necessary data -->
+			<id>prod</id>
+			<properties>
+				<!-- all cert properties comes from ./profiles/prod/certs/createKeyStoreWithCert.sh execution -->
+			</properties>
+			<build>
+				<!-- Enables populate application.properties reading from pom.xml -->
+				<resources>
+					<resource>
+						<directory>profiles/prod</directory>
+						<filtering>true</filtering>
+						<excludes>
+							<exclude>*.sh</exclude> <!-- Exclude scripts if exists -->
+						</excludes>
+					</resource>
+					<resource>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<build>
+		<!-- Common build plugins -->
+	</build>
+
+</project>
