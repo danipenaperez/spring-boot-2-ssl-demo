@@ -154,10 +154,8 @@
 	                        <name>mi-na-boo:${project.version}</name>
 	
 	                        <build>
-	
 	                            <!-- This is the same FROM used in a Dockerfile -->
 	                            <from>openjdk:8-jdk-alpine</from>
-	
 	                            <!-- This is the same ENTRYPOINT used in a Dockerfile -->
 	                            <entryPoint>
 	                                <exec>
@@ -169,12 +167,29 @@
 	                                    <arg>/maven/${project.artifactId}-${project.version}.${project.packaging}</arg>
 	                                </exec>
 	                            </entryPoint>
-	
-	                            <assembly>
+								<assembly>
 	                                <!-- This is a predefined assembly.xml that will only copy your final artifact to the Docker image -->
 	                                <descriptorRef>artifact</descriptorRef>
 	                            </assembly>
 	                        </build>
+	                        <!-- Specified properties to run the container -->
+	                        <run>
+	                        	<ports> 
+						           <port>9090:8080</port> <!-- exposed internal to external port definition -->
+						           <port>9443:8443</port> <!-- exposed internal to external port definition -->
+						        </ports>
+						        <wait> <!-- deferrer executions -->
+						          <log>The application must be started and is ready to accept connections</log>
+						          <time>20000</time>
+						        </wait>
+						        <!-- If needed dependency link for other containers
+						        <links>
+						        	<link>database:db</link>
+						        </links>
+						        -->
+	                        </run>
+	                        
+	                        
 	                    </image>
 	                </images>
 	            </configuration>
