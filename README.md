@@ -12,6 +12,7 @@ PROD:only runs on HTTPS, using an external provided keystore. If you want to aut
 
 Maven project, Java JDK 8 or higher
 
+
 ## Profile DEV
 
 This profile start the Http(8080) and Https(8443) Connectors. To perform HTTPS connector, the keytool maven plugin is executed on generate-resources phase.
@@ -31,7 +32,7 @@ ${project.home}/mvn clean spring-boot:run -P dev  (serve http:8080, https:8443 a
 ```
 ###Start (from Eclipse): 
 goto com.dppware.demossl.DemosslApplication Run As> Java Application
-(ensure that the cert is available on /target/classes/keystore.dev.p12 or other classpath project directory. You can generate the cert using mvn clean keytool:generateKeyPair
+(ensure that the cert is available on /target/classes/${ssl.keytool.keystore.name} or other classpath project directory. You can generate the cert using mvn clean keytool:generateKeyPair
 ```
 ### Customization DEV
 In this profile 
@@ -65,6 +66,19 @@ cd /profiles/prod/createKeyStoreWithCert.sh   (you can edit it to generate custo
 ## Running the tests
 
 Maven pahse integrated test
+
+
+## Dockerized
+This app is dockerized using fabric8 maven plugin. @see docker plugin usage https://dmp.fabric8.io/
+
+mvn clean package -P dev fabric8:build
+or
+mvn clean package -P prod fabric8:build
+
+This will generate the image based on maven project properties ->  project.name:project.version . Overwritting the local docker image if exists.
+
+Additional Docker info can be found on [danipenaperez-dockerTools](https://github.com/danipenaperez/dockerTools)
+
 
 
 ## Built With

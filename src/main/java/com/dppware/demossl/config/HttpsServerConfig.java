@@ -1,6 +1,8 @@
 package com.dppware.demossl.config;
 
 import org.apache.catalina.connector.Connector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
@@ -10,7 +12,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class HttpsServerConfig {
-
+	/**
+	 * The logger
+	 */
+	Logger LOGGER = LoggerFactory.getLogger(ApplicationReadyListener.class);
+	
+	
 	/**
 	 * 
 	 * @param httpPort
@@ -26,4 +33,8 @@ public class HttpsServerConfig {
 		tomcat.addAdditionalTomcatConnectors(connector);
 		return tomcat;
 	}
+	
+	
+	
+	
 }
